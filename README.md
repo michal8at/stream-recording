@@ -1,2 +1,8 @@
 # stream-recording
-Repozitár pre stránku nahrávanie audio streamu
+Repozitár pre nahrávanie audio streamu
+Testovacia verzia
+
+# run with
+```
+node recording.js
+```
