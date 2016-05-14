@@ -16,14 +16,15 @@ var requestStream = request(streamName, {timeout: 5000}, function (error, respon
 
 // ukoncenie spojenia v danom case podla configu
 // toto treba dokoncit
-console.log("Recoding close...");
-setTimeout(function() {
-console.log("Recoding is closed");
 
-}, 3000);
+/*
+console.log("Recoding close...");
+//closing
+
 //request.shouldKeepAlive = false;
 //request.pause();
 requestStream.abort();
 response.status = 400;
-response.end('upload limit exceeded');
+response.end('connection closed');
+*/
 
