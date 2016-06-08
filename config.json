@@ -1,0 +1,9 @@
+{
+  "streamUrl":"http://radio9.sk",
+  "port":"8000",
+  "path":"high.mp3",
+  "startDate":"2016-06-09",
+  "startTime":"00:20:00",
+  "timezoneShift":"+02:00",
+  "duration":"60"
+}

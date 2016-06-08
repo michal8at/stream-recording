@@ -1,30 +1,48 @@
 var fs = require('fs');
 var request = require('request');
+var nconf = require('nconf');
+var schedule = require('node-schedule');
 
-var streamName = 'http://radio9.sk:8000/high.mp3';
+nconf.argv()
+	.file({ file: 'config.json' });
 
-console.log("Recording start...");
-var requestStream = request(streamName, {timeout: 5000}, function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-	console.log("Record succesfull");
-  }else{
-	console.log("ERRORS:");
-	console.log(error);
-  }
-}).pipe(fs.createWriteStream('stream.mp3'));
+streamUrl = nconf.get('streamUrl');
+port = nconf.get('port');
+path = nconf.get('path');
 
+startDate = nconf.get('startDate');
+startTime = nconf.get('startTime');
+timezoneShift = nconf.get('timezoneShift');
 
-// ukoncenie spojenia v danom case podla configu
-// toto treba dokoncit
+duration = nconf.get('duration') * 1000;
 
-/*
-console.log("Recoding close...");
-//closing
+var start_td = new Date(startDate + "T" + startTime + timezoneShift);
 
-//request.shouldKeepAlive = false;
-//request.pause();
-requestStream.abort();
-response.status = 400;
-response.end('connection closed');
-*/
+//console.log("Waiting for recording in scheduled time (" + start_td + "-(" + start_td.getTime() + "))");
+console.log("Waiting for recording in scheduled time (" + start_td.toString() + ")");
 
+var job = schedule.scheduleJob(start_td, function(){
+	var streamName = streamUrl + ":" + port + "/" + path;
+	console.log("Recording start for: " + streamName);
+
+	var requestStream = request(streamName, {timeout: 5000}, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+			console.log("Record succesfull");
+	  }else{
+			console.log("ERRORS:");
+			console.log(error);
+			/*try to repeat connection
+				goes here
+			*/
+	  }
+	});
+	// pipe to file
+	requestStream.pipe(fs.createWriteStream('stream' + start_td.getTime() + '.mp3'));
+
+	// abort connection according to schedule in config
+	setTimeout(function() {
+		console.log('Recording stoped...');
+		requestStream.abort();
+	}, duration);
+	job.cancel();
+});
